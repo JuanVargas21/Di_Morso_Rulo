@@ -1,0 +1,37 @@
+name: Di_Morso_Rulo API CI
+
+# Disparadores: Se ejecuta en cada push o PR a la rama main
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # Levanta un servidor limpio de Ubuntu
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x] # Prueba tu API en dos versiones de Node.js
+
+    steps:
+    # 1. Clona el código del repositorio
+    - name: Descargar código del repositorio
+      uses: actions/checkout@v4
+
+    # 2. Configura el entorno de Node.js
+    - name: Configurar Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm' # Habilita la caché para instalaciones más rápidas
+
+    # 3. Instala las dependencias del proyecto (Express, etc.)
+    - name: Instalar dependencias
+      run: npm ci
+
+    # 4. Verifica que el proyecto inicie sin errores graves de sintaxis
+    # (Si tienes un script de build o linter, lo agregarías aquí)
+    - name: Verificar ejecución
+      run: node --check src/index.js
